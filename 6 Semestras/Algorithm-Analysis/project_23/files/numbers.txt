@@ -1,0 +1,10 @@
+#Lines starting with # will be removed. Example below
+#number_to_check;algorithm[1 for eratosthenes,2 for miller_rabin];iterations_for_miller_rabin;
+#121;2;10
+#18127;1
+
+18977;2
+777;2
+10007;2
+64577;2
+44444;2
