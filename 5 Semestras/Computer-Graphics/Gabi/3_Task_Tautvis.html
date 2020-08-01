@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Nupjautinis kugis Tautvydas Grabauskas</title>
+    <script type="text/javascript" src="libs\three.js"></script>
+    <script type="text/javascript" src="libs\jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="libs\stats.js"></script>
+	<script type="text/javascript" src="libs\dat.gui.js"></script>
+	<script type="text/javascript" src="libs\TrackballControls.js"></script>
+	<script type="text/javascript" src="libs\ConvexGeometry.js"></script>
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output"> </div>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output"> </div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+
+		var clock = new THREE.Clock();
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+		var axes = new THREE.AxisHelper( 10 );
+        scene.add(axes);
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		// position and point the camera to the center of the scene
+        camera.position.x = 30;
+        camera.position.y = 0;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+		// create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0xEEEEEE, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+		// add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(60,60);
+        var planeMaterial =    new THREE.MeshLambertMaterial({color: 0xffffff});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.receiveShadow  = true;
+        // rotate and position the plane
+        plane.rotation.x=-0.5*Math.PI;
+        plane.position.x=0
+        plane.position.y=0
+        plane.position.z=0
+        scene.add(plane);
+
+		// add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( -40, 60, -10 );
+        spotLight.castShadow = true;
+        scene.add( spotLight );
+
+		var light = new THREE.AmbientLight( 0xDDDDDD); // soft white light
+		scene.add( light );
+
+		var trackballControls = new THREE.TrackballControls(camera, renderer.domElement);
+		trackballControls.rotateSpeed = 1.0;
+        trackballControls.zoomSpeed = 1.0;
+        trackballControls.panSpeed = 1.0;
+		//trackballControls.noZoom=false;
+		//trackballControls.noPan=false;
+        trackballControls.staticMoving = false;
+		//trackballControls.dynamicDampingFactor=0.3;
+
+		var controls = new function() {
+            this.points = 800;
+			this.R = 10;
+			this.h = 20;
+			this.redraw = function () {
+                scene.remove(spGroup);
+                scene.remove(hullMesh);
+                generatePoints();
+            };
+			this.update = function () {
+				//scene.remove(spGroup);
+                //scene.remove(hullMesh);
+                generatePoints();
+            };
+			this.inside = false;
+        }
+
+		var gui = new dat.GUI();
+        gui.add(controls, 'points',100,800).onChange(controls.update);
+		gui.add(controls, 'R',5,20).onChange(controls.update);
+		gui.add(controls, 'h',5,30).onChange(controls.update);
+		gui.add(controls, 'redraw');
+		gui.add(controls, 'inside');
+
+		/////////////////////////////////////////////
+		///..........................................
+		var epsilon = 0.2;
+
+		generatePoints();
+		function generatePoints() {
+			var points = [];
+			var R = controls.R;
+			var h = controls.h;
+
+			for (var i = 0; i < controls.points; i++) {
+
+				var R = controls.R;
+				var h = controls.h;
+
+				var x = -R + (Math.random() * R*2);
+				//var y = -20 + Math.round(Math.random() * 40);
+				var y = (h/2) * i/(controls.points);
+				//var y = -R + (Math.random() * R*2);
+				var z = -R + (Math.random() * R*2);
+
+				if( Math.abs (x*x + z*z - ( (R*R)/(h*h) ) * (y-h/2)*(y-h/2) <= epsilon)){
+				//if( x*x + z*z <= ( (R*R)/(h) ) * (y-h/2)*(y-h/2) ){
+					//&& y >=-h && y<=h)
+					points.push(new THREE.Vector3(x, y, z));
+				}
+			}
+
+			for (var i = 0; i < controls.points; i++) {
+
+				var x = -R + (Math.random() * R*2);
+				var y = 0;
+				//var z = -R + (Math.random() * R*2);
+				var z = -R + (Math.random() * R*2);
+				if( Math.abs ( x*x + z*z - (( (R*R)/(h*h) ) * (y-h/2)*(y-h/2) )) <= epsilon){
+					points.push(new THREE.Vector3(x, y, z));
+				}
+				/*if( Math.abs (x*x + z*z - R*R) <= epsilon){
+					points.push(new THREE.Vector3(x, y, z));
+				}*/
+			}
+
+			for (var i = 0; i < controls.points; i++) {
+
+				var x = -R + (Math.random() * R*2);
+				var y = (h/2);
+				//var z = -R + (Math.random() * R*2);
+				var z = -R + (Math.random() * R*2);
+				if( Math.abs ( x*x + z*z - (( (R*R)/(h*h) ) * (y-h/2)*(y-h/2) )) <= epsilon){
+					points.push(new THREE.Vector3(x, y, z));
+				}
+			}
+
+			spGroup = new THREE.Object3D();
+			var material = new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true});
+			points.forEach(function (point) {
+				var spGeom = new THREE.SphereGeometry(0.1);
+				var spMesh = new THREE.Mesh(spGeom, material);
+				spMesh.position = point;
+				spGroup.add(spMesh);
+			});
+			// add the points as a group to the scene
+			scene.add(spGroup);
+
+
+			///////////////////////////////////////////////////////////////////////////////
+			// use the same points to create a convexgeometry
+			var hullGeometry = new THREE.ConvexGeometry(points);
+
+			assignUVs1(hullGeometry);
+			//assignUVs2(hullGeometry);
+			//hullMesh = createMesh(mappedGeo);
+			hullMesh = createMesh(hullGeometry);
+			scene.add(hullMesh);
+		}
+
+
+		function assignUVs1(geometry) {
+
+			var epsilon = 1;
+			var fix = 1;
+			geometry.faceVertexUvs[0] = [];
+			geometry.faces.forEach(function(face) {
+
+				var components = ['x', 'y', 'z'].sort(function(a, b) {
+					return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
+				});
+				var v1 = geometry.vertices[face.a];
+				var yaw1 = my_atan( v1.getComponent(2), v1.getComponent(0) ) / ( 2.0 * Math.PI );
+				var pitch1 = v1.getComponent(1) / controls.h*2;
+
+				var v2 = geometry.vertices[face.b];
+				var yaw2 = my_atan( v2.getComponent(2), v2.getComponent(0) ) / ( 2.0 * Math.PI );
+				var pitch2 = v2.getComponent(1) / controls.h*2;
+
+				var v3 = geometry.vertices[face.c];
+				var yaw3 = my_atan( v3.getComponent(2), v3.getComponent(0) ) / ( 2.0 * Math.PI );
+				var pitch3 = v3.getComponent(1) / controls.h*2;
+
+				////////////////////////
+				if(Math.abs(yaw1) < epsilon &&  Math.abs(yaw2-1) < epsilon && Math.abs(yaw3-1) < epsilon){
+					yaw1 += fix;
+					//yaw1 = (yaw2+yaw3)/2;
+				}else if(Math.abs(yaw2) < epsilon &&  Math.abs(yaw1-1) < epsilon && Math.abs(yaw3-1) < epsilon){
+					yaw2 += fix;
+					//yaw2 = (yaw1+yaw3)/2;
+				}else if(Math.abs(yaw3) < epsilon &&  Math.abs(yaw1-1) < epsilon && Math.abs(yaw2-1) < epsilon){
+					yaw3 += fix;
+					//yaw3 = (yaw2+yaw1)/2;
+				}
+				///////////////////////
+				if(Math.abs(yaw3) < epsilon &&  Math.abs(yaw2) < epsilon && Math.abs(yaw1-1) < epsilon){
+					yaw1 -= fix;
+					//yaw1 = (yaw2+yaw3)/2;
+				}else if(Math.abs(yaw2) < epsilon &&  Math.abs(yaw1) < epsilon && Math.abs(yaw3-1) < epsilon){
+					yaw3 -= fix;
+					//yaw3 = (yaw2+yaw1)/2;
+				}else if(Math.abs(yaw3) < epsilon &&  Math.abs(yaw1) < epsilon && Math.abs(yaw2-1) < epsilon){
+					yaw2 -= fix;
+					//yaw2 = (yaw1+yaw3)/2;
+				}
+
+				geometry.faceVertexUvs[0].push([
+					new THREE.Vector2(yaw1, pitch1),
+					new THREE.Vector2(yaw2, pitch2),
+					new THREE.Vector2(yaw3, pitch3)
+				]);
+			});
+			geometry.uvsNeedUpdate = true;
+		}
+
+		function assignUVs2(geometry) {
+			geometry.faceVertexUvs[0] = [];
+			geometry.faces.forEach(function(face) {
+				var uvs = [];
+				var ids = [ 'a', 'b', 'c'];
+				for( var i = 0; i < ids.length; i++ ) {
+					var vertex = geometry.vertices[ face[ ids[ i ] ] ].clone();
+					var pitch = vertex.y / controls.h*2;
+
+					var n = vertex.normalize();
+					//var yaw = 0.7 - Math.atan( n.z, - n.x ) / ( 2.0 * Math.PI );
+					//var pitch = 0.5 - Math.asin( n.y ) / Math.PI;
+
+					//var x = Math.atan( n.z, n.x );
+					//var aTan = (x > 0 ? x : (1.99*Math.PI + x)) //* 360 / (2*Math.PI)
+
+
+					var yaw = my_atan( n.z, n.x ) / ( 2.0 * Math.PI );
+					//var pitch = n.y;
+					var u = yaw,
+						v = pitch;
+					uvs.push( new THREE.Vector2( u, v ) );
+				}
+				geometry.faceVertexUvs[ 0 ].push( uvs );
+			});
+			geometry.uvsNeedUpdate = true;
+		}
+
+
+		function createMesh(geom) {
+
+			// 'checks.png' // "checkered.jpg" // "lab.jpg" // "chess.jpg" // "fixedchess.jpg" // "nicetry.jpg"
+
+			var texture = THREE.ImageUtils.loadTexture('tiling_86i.jpg');
+			//texture.repeat.set(0.5, 0.5);
+            //texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+            // assign two materials
+            //var meshMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00, transparent: true, opacity: 0.2});
+            var meshMaterial = new THREE.MeshPhongMaterial();
+            meshMaterial.map = texture;
+
+			//meshMaterial.side = THREE.DoubleSide;
+            var wireFrameMat = new THREE.MeshBasicMaterial();
+            wireFrameMat.wireframe = true;
+            // create a multimaterial
+            var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial, wireFrameMat]);
+            return mesh;
+        }
+
+		render();
+
+		function render() {
+            //stats.update();
+            var delta = clock.getDelta();
+            trackballControls.update(delta);
+			//spGroup.rotation.y = step;
+            //hullMesh.rotation.y = step += 0.01;
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+
+		function my_atan(y, x){
+			var temp = Math.atan2( y, x );									//[-180 ; 180]
+			var aTanFixed = (temp > 0 ? temp : (2.0*Math.PI + temp))		//[0 ; 360]
+			return aTanFixed;
+		}
+
+    });
+</script>
+</body>
+</html>

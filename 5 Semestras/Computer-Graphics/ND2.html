@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Marius Pozniakovas, 2 task </title>
+    <script type="text/javascript" src="libs/three.min.js"></script>
+    <script type="text/javascript" src="libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="libs/stats.js"></script>
+    <script type="text/javascript" src="libs/dat.gui.js"></script>
+
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(0xAAAAA, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+
+
+		var p_x = 0;
+		var p_y = 0;
+		var p_z = -18;
+		var white = 1;
+
+
+
+		var cubeGeometry = new THREE.CubeGeometry(180,180,1);
+    var cubeMaterialWhite = new THREE.MeshLambertMaterial({color: 0xAABBCCDD});
+		var cube = new THREE.Mesh(cubeGeometry,cubeMaterialWhite)
+
+		cube.castShadow  = false;
+		cube.receiveShadow = true;
+		cube.position.x=0;
+		cube.position.y=0;
+		cube.position.z=0;
+
+		scene.add(cube);
+
+
+    //camera position
+    camera.position.x = 72.93931476328261;
+    camera.position.y = 84.08326188622074;
+    camera.position.z = 306.29542926311996;
+
+    camera.rotation.x = 1;
+    camera.rotation.y = -0.06;
+    camera.rotation.z = 0.006;
+    //camera.lookAt(scene.position);
+
+
+
+    // add spotlight for the shadows
+    var spotLight = new THREE.SpotLight( 0xffffff, 3 );
+    spotLight.position.set( 200, 400, 250 );
+    spotLight.castShadow = true;
+    spotLight.target.position.set(100,20,100);
+    scene.add(spotLight);
+
+    //testing material
+    var faceMaterial = new THREE.MeshLambertMaterial( { color: 0x0087E6 } );
+    var cubeGeometry = new THREE.CubeGeometry(10,10,10);
+
+    var test = new THREE.Mesh(cubeGeometry,faceMaterial)
+
+    test.castShadow  = true;
+    test.receiveShadow = false;
+    test.position.x=0;
+    test.position.y=0;
+    test.position.z=5;
+
+    scene.add(test);
+
+
+
+        // add the output of the renderer to the html element
+    $("#WebGL-output").append(renderer.domElement);
+		var controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+		render();
+
+
+
+    //creating mesh
+    function createMesh(geom, col) {
+
+      // assign two materials
+      //  var meshMaterial = new THREE.MeshBasicMaterial({color:0x00ff00, transparent:true, opacity:0.6});
+      var meshMaterial = new THREE.MeshLambertMaterial({color: col, transparent:false});
+      meshMaterial.side = THREE.DoubleSide;
+      //var wireFrameMat = new THREE.MeshBasicMaterial();
+      //wireFrameMat.wireframe = true;
+
+      // create a multimaterial
+      //var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial]);
+
+			var mesh = new THREE.Mesh(geom, meshMaterial);
+			mesh.castShadow = true;
+
+
+            return mesh;
+        }
+
+    //create rendering
+    function render() {
+        // render
+  		renderer.render( scene, camera );
+  		requestAnimationFrame( render );
+  		controls.update();
+      console.log('x')
+      console.log(camera.position.x)
+      console.log('y')
+      console.log(camera.position.y)
+      console.log('z')
+      console.log(camera.position.z)
+		}
+
+    });
+
+
+
+</script>
+</body>
+</html>
