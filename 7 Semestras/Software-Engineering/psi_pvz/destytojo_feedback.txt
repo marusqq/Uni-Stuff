@@ -1,0 +1,55 @@
+Sveiki,
+
+
+
+1. Pagal naudojimo atvejų diagramą administratorius paveldi iš apklausų tvarkytojo, bet aš vis tiek naudojimų atvejų aprašuose kaip dalyvius įvardinčiau ir apklausų tvarkytoją, ir administratorių.
+
+
+
+2. Aprašant naudojimo atvejo eigą turėtų aiškiau matytis pagrindinė eiga ir alternatyvūs variantai, pavyzdžiui:
+vietoje:
+3. Jei duomenys teisingi, naudotojas prisijungia prie sistemos, jeigu suvesti duomenys nėra teisingi, pranešama, jog suvestas prisijungimo vardas arba slaptažodis yra neteisingi
+
+aš rašyčiau
+3. Jei duomenys teisingi, sistema pateikia naudotojui ... puslapį.
+3A. Jei duomenys neteisingi, sistema išduoda pranešimą ... ir palieka prisijungimo puslapyje naudotojo suvestus duomenis (tęsiama nuo 2 žingsnio)
+
+
+
+3. Naudojimo atvejų pavadinimai diagramoje ir aprašymuose turi sutapti. Dabar yra, pavyzdžiui, "Slaptažodžio keitimas" ir "Slaptažodžio pakeitimas".
+
+
+
+4. SVARBU. Jūs aprašote atskirą naudojimo atvejį prisijungimui prie sistemos, bet po to slaptažodžio keitimo naudojimo atvejyje pakartojate viską iš prisijungimo naudojimo atvejo. Korektiškai reiktų daryti taip:
+- prisijungimo naudojimo atvejis tiesiogiai nėra pasiekiamas (nėra ryšio tarp apklausų kūrėjo ir šio naudojimo atvejo);
+- prisijungimo naudojimo atvejis turi įdedamas į slaptažodžio keitimo naudojimo atvejį (ryšys include arba pagal veiąn iš nagrinėtų metodikų precede).
+Tas pats ir su kitais naudojimo atvejais, kuriems reikia būti prisijungus prie sistemos.
+
+
+
+5. Pasitikrinkite su reikalavimų specifikacija, ar nėra kokių nors reikalbvimų slaptažodžiui. Pagal dabartinį naudojimo atvejį jis gali būti bet koks (galbūt, net tuščias).
+
+
+
+6. Lieka visai neaišku, koks rezultatas Slaptažodžio priminimo naudojimo atvejo. Pasakoma, kad išsiunčiamas laiškas, bet neaišku, o kas tame laiške. Pagal dabartines geriausias praktikas laikoma, kad geresnis būdas yra ne sugfeneruoti naują slaptažodį ir išsiųsti jį el. paštu, bet el. paštu nusiųsti unikalią šiam prašymui nuorodą, galiojančią, pavyzdžiui, 24 valandas, į slaptažodžio pasikeitimo puslapį.
+
+
+
+7. Paieška visiškai neapibrėžta, kas yra " Į paieškos laukelį suvedami raktiniai žodžiai". Neaišku, kodėl kalbama apie anketas. Turi būti pasakyta:
+- kokiuose laukuose ieškoma;
+- pagal ką ieškoma (pilną reikšmę, pradžią ar fragmentą).
+
+
+
+8. Trynimo problemos:
+- negalima trinti naudotojo, jei jis yra sukūręs apklausų (reikia deaktyvavimo funkcijos);
+- paskutinis 7-as žingsnis iš kito naudojimo atvejo.
+
+
+
+9. Jei administratorius sukuria naudotojui slaptažodį, ati pirmą kartą naudotojui jungiantis sistema turi reikalauti, kad jis pasikeistų slaptažodį.
+
+
+
+Sėkmės
+Saulius

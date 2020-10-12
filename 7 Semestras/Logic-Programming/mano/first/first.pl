@@ -67,14 +67,22 @@ uosvis(Uosvis, Zentas) :- pora(Zentas, Jo_mergina), mama(Merginos_mama, Jo_mergi
     uosvis(pio, jonas)            -- false
 */
 
+tevas_arba_mama(Suauges, Vaikas) :- mama(Suauges, Vaikas) ; (pora(Suauges, Mama), mama(Mama, Vaikas)).
+brolis_arba_sese(Vaikas1, Vaikas2) :- mama(Mama, Vaikas1), mama(Mama, Vaikas2).
+
 /* 24: */
-pusbrolis(Pusbrolis, PusbrolisPussesere) :- asmuo(Pusbrolis, vyras, _, _), mama(PusbrolioMama, Pusbrolis), mama(AntroMama, PusbrolisPussesere), not(PusbrolioMama = AntroMama).
+pusbrolis(Pusbrolis, PusbrolisPussesere) :-
+    asmuo(Pusbrolis, vyras, _, _),
+    tevas_arba_mama(PirmasTevas, Pusbrolis), 
+    tevas_arba_mama(AntrasTevas, PusbrolisPussesere),
+    brolis_arba_sese(PirmasTevas, AntrasTevas).
 /* testai: 
 	pusbrolis(domas, pieva)       -- true
     pusbrolis(pieva, domas)		  -- false
     pusbrolis(giedre, pieva)      -- false
     pusbrolis(domas, giedre)      -- true
 */
+    
 
 /* 30: */
 nepilnametis(Nepilnametis)  :- asmuo(Nepilnametis, _, Amzius, _), Amzius < 18.
@@ -93,6 +101,7 @@ vpjz(Vyras)  :- asmuo(Vyras, vyras, Amzius, _), Amzius < 40, Amzius >= 18.
     vpjz(pranas)                  -- false
     vpjz(kristas)                 -- true
 */
+
 
 
 
