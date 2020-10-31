@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Tautvydas Grabauskas 2 Uzduotis </title>
+    <script type="text/javascript" src="libs/three.min.js"></script>
+    <script type="text/javascript" src="libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="libs/stats.js"></script>
+    <script type="text/javascript" src="libs/dat.gui.js"></script>
+
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(0xEEEEEE, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+
+
+		var p_x = 0;
+		var p_y = 0;
+		var p_z = -18;
+		var white = 0;
+
+		for(i = 0; i < 8; i++){
+			for(j = 0; j < 8; j++){
+
+				var cubeGeometry = new THREE.CubeGeometry(18,18,4);
+				var cubeMaterialBlack = new THREE.MeshLambertMaterial({color: 0x101010});
+				var cubeMaterialWhite = new THREE.MeshLambertMaterial({color: 0xffffff});
+				//var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+				if(white == 1){
+					var cube = new THREE.Mesh(cubeGeometry,cubeMaterialWhite);
+					white = 0;
+				}
+				else if(white == 0) {
+					var cube = new THREE.Mesh(cubeGeometry,cubeMaterialBlack);
+					white = 1;
+				}
+				cube.castShadow  = false;
+				cube.receiveShadow = true;
+				cube.position.x=p_x;
+				cube.position.y=p_y;
+				cube.position.z=p_z;
+				p_x += 18;
+				scene.add(cube);
+
+			}
+			p_x=0;
+			p_y+=18;
+			if(white == 1){
+				white = 0;
+			}
+			else {
+				white = 1;
+			}
+		}
+
+        // rotate and position the plane
+        //plane.rotation.x=-0.5*Math.PI;
+        //plane.position.x=15
+        //plane.position.y=0
+        //plane.position.z=0
+
+        // add the plane to the scene
+        //scene.add(plane);
+
+        // input data
+        var radius = 7;
+        //var roomHeight = 25;
+        var stepThickness = 1;
+        var roomHeight = 15*stepThickness;
+        var stepWidth = 2.5;
+        var stepOffset = 2;
+
+
+        // create steps
+        var cubeGeometry = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: 0x101010});
+        var step, box, i;
+
+
+
+        // position and point the camera to the center of the scene
+        /*
+		camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+		*/
+
+		camera.position.x = 30;
+        camera.position.y = -50;
+        camera.position.z = 42;
+		camera.rotation.x = 1;
+        camera.rotation.y = -0.06;
+        camera.rotation.z = 0.006;
+        camera.lookAt(scene.position);
+
+		/*
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff, 10 );
+        spotLight.position.set( 200, 200, 40 );
+        spotLight.castShadow = true;
+        scene.add( spotLight );
+		*/
+
+		// add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff, 3 );
+        spotLight.position.set( 200, 400, 250 );
+        spotLight.castShadow = true;
+
+		spotLight.target.position.set(100,20,100);
+        scene.add( spotLight );
+
+
+        // add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+		var controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+		var j=0;
+		for (i=0; i<8; i++){
+			pawn(12, j, 18, 0x101010);
+			j += 18;
+		}
+
+		var k=0;
+		for (i=0; i<8; i++){
+			pawn(12, k, 108, 0xffffff);
+			k += 18;
+		}
+
+		bishop(12, 36, 0, 0x101010);
+		bishop(12, 90, 0, 0x101010);
+		bishop(12, 36, 126, 0xffffff);
+		bishop(12, 90, 126, 0xffffff);
+		queen(12, 72, 0, 0x101010);
+		king(12, 54, 0, 0x101010);
+		queen(12, 72, 126, 0xffffff);
+		king(12, 54, 126, 0xffffff);
+		horse(24, 18, 0, 0x101010, 1);
+		horse(24, 108, 0, 0x101010, 1);
+		horse(24, 18, 126, 0xffffff, -1);
+		horse(24, 108, 126, 0xffffff, -1);
+		tower(24, 0, 0, 0x101010);
+		tower(24, 126, 0, 0x101010);
+		tower(24, 0, 126, 0xffffff);
+		tower(24, 126, 126, 0xffffff);
+
+		//generatePoints(12);
+		//bishop(12);
+		render();
+
+		function pawn(segments, m_x, m_y, color) {
+            var pointsX = [
+                250, 220, 208,
+		201, 196, 194, 194, 197,
+		203, 213, 225, 208, 203,
+		208, 228, 226, 224, 221,
+		217, 212, 204, 188, 185,
+		174, 169, 168, 175, 172,
+		172, 173, 250 ];
+	    var pointsY = [
+		34, 46, 58,
+		70, 82, 94, 106, 118,
+		130, 142, 154, 166, 178,
+		190, 202, 214, 226, 238,
+		250, 262, 274, 286, 298,
+		310, 322, 334, 346, 358,
+		370, 382, 382];
+	    // add 10 random spheres
+            var points = [];
+            var height = 2;
+            var count = 31;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3(25-pointsX[i]/10, 0, (pointsY[30]-pointsY[i]-174)/10));
+            }
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            latheMesh = createMesh(latheGeometry, color);
+			latheMesh.position.x = m_x;
+			latheMesh.position.y = m_y;
+            scene.add(latheMesh);
+        }
+
+		function tower(segments, move_x_by, move_y_by, color) {
+            var pointsX = [
+				 250, 350, 350, 315, 320,
+				 310, 295, 325, 345, 355,
+				 350, 217, 212, 204, 188, 185,
+					174, 169, 168, 175, 172,
+					172, 173, 250];
+	    var pointsY = [
+			 55, 55, 100, 125, 145,
+			 160, 166, 306, 311, 326,
+			 341, 250, 262, 274, 286, 298,
+		310, 322, 334, 346, 358,
+		370, 382, 382];
+	    // add 10 random spheres
+            var points = [];
+            var height = 1;
+            var count = 33;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3((25-pointsX[i]/10)*1, 0, ((1-pointsY[i]+100)/10)*1));
+            }
+
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            var latheMesh = createMesh(latheGeometry, color);
+
+
+			var extrudeSettings = {
+			amount : 4,
+			steps : 1,
+			bevelEnabled: false,
+			curveSegments: 24
+			};
+
+
+			var column = new THREE.Object3D();
+			var shape = new THREE.Shape();
+			shape.moveTo(10,10);
+			shape.bezierCurveTo(14, 14, 17, 14, 21, 10);
+			shape.lineTo(20, 9);
+			shape.bezierCurveTo(18, 13, 13, 13, 11,  9);
+
+
+			var geome = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+			var meshMat = new THREE.MeshPhongMaterial({color: color, shininess : 100.0, });
+
+			var mesha = new THREE.Mesh(geome, meshMat);
+			mesha.castShadow = true;
+			mesha.receiveShadow = true;
+
+			mesha.position.z = 4;
+			mesha.position.x = 10;
+			mesha.position.y = 13;
+			mesha.rotation.z = 10.1;
+
+			column.add(mesha);
+
+			//var geome = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+
+			var mesha2 = new THREE.Mesh(geome, meshMat);
+			mesha2.castShadow = true;
+			mesha2.receiveShadow = true;
+
+			mesha2.position.z = 4;
+			mesha2.position.x = 9;
+			mesha2.position.y = -13;
+			mesha2.rotation.z = 1.90;
+
+			column.add(mesha2);
+
+			var mesha3 = new THREE.Mesh(geome, meshMat);
+			mesha3.castShadow = true;
+			mesha3.receiveShadow = true;
+
+			mesha3.position.z = 4;
+			mesha3.position.x = -16;
+			mesha3.position.y = 1;
+			mesha3.rotation.z = 5.99;
+
+			column.add(mesha3);
+
+			column.add(latheMesh);
+
+			scene.add(column);
+
+
+
+			//latheMesh.castShadow = true;
+
+
+            //scene.add(latheMesh);
+
+			column.position.z = 11;
+
+			column.position.y = move_y_by;
+
+			column.position.x = move_x_by;
+
+
+        }
+
+
+		function king(segments, m_x, m_y, color) {
+            var pointsX = [
+				250, 260, 275, 270, 285,
+				  285, 270, 280, 315, 315,
+				  300, 305, 295, 300, 310,
+				  315, 325, 325, 315, 295,
+				  290, 290, 295, 300, 310,
+				  315, 340, 345, 340, 340,
+				  250];
+	    var pointsY = [
+			  10, 15, 25, 35, 35,
+			  60, 61, 76, 86, 96,
+			  166, 171, 176, 186, 191,
+			  201, 206, 221, 231, 236,
+			  246, 306, 351, 376, 386,
+			  406, 421, 436, 456, 486,
+			  491];
+	    // add 10 random spheres
+            var points = [];
+            var height = 2;
+            var count = 31;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3(25-pointsX[i]/10, 0, (1-pointsY[i])/10));
+            }
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            latheMesh = createMesh(latheGeometry, color);
+			latheMesh.position.x = m_x;
+			latheMesh.position.y = m_y;
+			latheMesh.position.z = 30;
+            scene.add(latheMesh);
+        }
+
+
+
+
+		function queen(segments, m_x, m_y, color) {
+            var pointsX = [
+				250, 260, 275, 280, 290,
+				  270, 315, 310, 315, 305,
+				  280, 305, 305, 295, 285,
+				  280, 280, 290, 295, 300, 310,
+				  315, 340, 345, 340, 340,
+				  250];
+	    var pointsY = [
+			  10, 15, 20, 15, 20,
+			  60, 66, 76, 86, 91,
+			  156, 176, 186, 191, 211,
+			  236, 256, 291, 351, 376, 386,
+			  406, 421, 436, 456, 486,
+			  491];
+	    // add 10 random spheres
+            var points = [];
+            var height = 2;
+            var count = 27;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3(25-pointsX[i]/10, 0, (1-pointsY[i])/10));
+            }
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            latheMesh = createMesh(latheGeometry, color);
+			latheMesh.position.x = m_x;
+			latheMesh.position.y = m_y;
+			latheMesh.position.z = 28.5;
+            scene.add(latheMesh);
+        }
+
+		//----------------------horse
+		function horse(segments, move_x_by, move_y_by, color, direction) {
+        var pointsX = [
+		245, 395, 375, 370, 375, 400, 245
+		/*
+				 250, 395, 405, 410, 405,
+				 395, 365, 365, 390, 405,
+				 450, 450, 250*/];
+	    var pointsY = [
+		385, 385, 400, 415, 425, 445, 446
+		/*
+			 365, 365, 370, 385, 395,
+			 400, 401, 406, 426, 461,
+			 461, 496, 496*/];
+	    // add 10 random spheres
+            var points = [];
+            var height = 1;
+            var count = 7;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3((25-pointsX[i]/10)*0.5, 0, ((1-pointsY[i]+100)/10)*0.5));
+            }
+
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            var latheMesh = createMesh(latheGeometry, color);
+			//latheMesh.castShadow = true;
+			var horse = new THREE.Object3D();
+
+			var extrudeSettings = {
+				amount : 70,
+				steps : 1,
+				bevelEnabled: false
+			};
+
+			var hX = [ 130, 140, 165, 195, 225,
+					 245, 260, 260, 255, 245,
+					 230, 210, 185, 175, 170,
+					 155, 140, 130, 125, 205,
+					 200, 220, 235, 245, 260,
+					 310, 340, 370, 385, 385,
+					 370, 350, 345, 345, 140];
+			var hY = [360, 320, 285, 260, 235,
+					 215, 186, 166, 151, 171,
+					 181, 181, 181, 191, 201,
+					 206, 201, 191, 171, 71,
+					 16, 21, 36, 56, 41,
+					 61, 81, 111, 156, 191,
+					 246, 296, 326, 361, 361];
+
+
+			var shape = new THREE.Shape();
+			shape.moveTo(hX[0],hY[0]);
+
+			for(i = 1; i <35; i++){
+				shape.lineTo(hX[i], hY[i]);
+
+			}
+
+			/*var eye = new THREE.Shape();
+			var eX = [215, 220, 230,  225,
+				215];
+			var eY = [85, 80, 80,  95,
+				95];
+
+			eye.moveTo(eX[0], eY[0]);
+			for(i = 1; i < 5; i++){
+				eye.lineTo(hX[i], hY[i]);
+			}
+
+			shape.holes.push(eye);*/
+
+
+			var geome = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+			var meshMat = new THREE.MeshPhongMaterial({color: color, shininess : 100.0, });
+			meshMat.side = THREE.DoubleSide;
+
+			var mesha = new THREE.Mesh(geome, meshMat);
+			mesha.castShadow = true;
+			mesha.receiveShadow = true;
+
+
+
+
+			mesha.scale.set(0.1, 0.1, 0.1);
+
+
+			if(direction == 1){
+				mesha.position.x = -4;
+				mesha.position.y = 24;
+				mesha.position.z = 22;
+				mesha.rotation.x = -Math.PI/2;
+				mesha.rotation.y = Math.PI/2;
+			}
+			else{
+				mesha.position.x = 4;
+				mesha.position.y = -24;
+				mesha.position.z = 22;
+				mesha.rotation.x = -Math.PI/2;
+				mesha.rotation.y = Math.PI*1.5;
+
+			}
+
+
+
+
+			horse.add(mesha);
+
+            horse.add(latheMesh);
+
+
+
+
+			scene.add(horse);
+
+			horse.position.z = 1;
+
+			horse.position.y = move_y_by;
+
+			horse.position.x = move_x_by;
+
+
+        }
+
+		//--------------------------horse
+
+		function bishop(segments, m_x, m_y, color) {
+            var pointsX = [
+			250, 260, 275, 290, 295,
+			 295, 290, 280, 285, 290,
+			 290, 285, 300, 300, 280,
+			 280, 280, 285, 290, 295,
+			 300, 305, 310, 325, 335,
+			 335, 325, 335, 335, 250 ];
+	    var pointsY = [
+		 60, 65, 90, 115, 135,
+		 150, 161, 171, 181, 186,
+		 196, 206, 211, 226, 226,
+		 236, 251, 266, 276, 291,
+		 301, 311, 321, 326, 336,
+		 351, 361, 366, 411, 411];
+	    // add 10 random spheres
+            var points = [];
+            var height = 2;
+            var count = 30;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector3(25-pointsX[i]/10, 0, (1-pointsY[i])/10));
+            }
+
+            var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), 0, 2 * Math.PI);
+            latheMesh = createMesh(latheGeometry, color);
+			latheMesh.position.x = m_x;
+			latheMesh.position.y = m_y;
+			latheMesh.position.z = 25
+            scene.add(latheMesh);
+        }
+
+        function createMesh(geom, col) {
+
+            // assign two materials
+            //  var meshMaterial = new THREE.MeshBasicMaterial({color:0x00ff00, transparent:true, opacity:0.6});
+            var meshMaterial = new THREE.MeshLambertMaterial({color: col, transparent:false});
+            meshMaterial.side = THREE.DoubleSide;
+            //var wireFrameMat = new THREE.MeshBasicMaterial();
+            //wireFrameMat.wireframe = true;
+
+            // create a multimaterial
+            //var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial]);
+
+			var mesh = new THREE.Mesh(geom, meshMaterial);
+			mesh.castShadow = true;
+
+
+            return mesh;
+        }
+
+        function render() {
+        // render
+		renderer.render( scene, camera );
+		requestAnimationFrame( render );
+		controls.update();
+
+		}
+
+    });
+
+
+
+</script>
+</body>
+</html>

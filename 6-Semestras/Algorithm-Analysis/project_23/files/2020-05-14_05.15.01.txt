@@ -1,0 +1,5 @@
+18977 is COMPOSITE number. Algorithm used: Miller-Rabin. Iterations used None.  Time passed: 3.190000000008464e-05 secs
+777 is COMPOSITE number. Algorithm used: Miller-Rabin. Iterations used None.  Time passed: 1.56000000000045e-05 secs
+10007 is PRIME number. Algorithm used: Miller-Rabin. Iterations used None.  Time passed: 4.90999999999131e-05 secs
+10 is COMPOSITE number. Algorithm used: Miller-Rabin. Iterations used None.  Time passed: 1.4999999999876223e-06 secs
+44444 is COMPOSITE number. Algorithm used: Miller-Rabin. Iterations used None.  Time passed: 3.399999999986747e-06 secs
