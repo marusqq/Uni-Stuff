@@ -1,0 +1,9 @@
+M->F:
+
+1 sudo
+2 red
+
+
+M->M
+yellow short
+blue short	
