@@ -7,6 +7,9 @@ __email__ = "pozniakovui@gmail.com"
 import json
 import os
 
+HEX_IMMED = ["swi", "lwi"]
+JUMPS = ["jmpi", "jnzi", "jzi", "jnbafi", "jbafi"]
+
 COMMANDS_USING_RD = [
     "lw",
     "sw",
@@ -36,7 +39,7 @@ COMMANDS_USING_RD = [
     "op3",
     "xor",
     "and",
-    "or"
+    "or",
 ]
 
 COMMANDS_USING_RS = [
@@ -55,6 +58,13 @@ COMMANDS_USING_RS = [
 ]
 
 COMMANDS_USING_IMMED = ["lwi", "swi", "jmpi", "jnzi", "jzi", "jnbafi", "jbafi", "lii"]
+
+def is_hex(s):
+    try:
+        int(s, 16)
+        return True
+    except ValueError:
+        return False
 
 
 def _check_for_single_digit_hex(hex_value):
@@ -239,6 +249,9 @@ def build_test_line(hex_commands, history):
         # start collecting full register
         reg_6bit = reg1_bin
 
+    else:
+        reg_6bit = "000"
+
     # get reg2
     if command in COMMANDS_USING_RS:
         reg2 = input("RS:  ")
@@ -267,19 +280,30 @@ def build_test_line(hex_commands, history):
     if command in COMMANDS_USING_RS:
         history_line.append(reg2)
 
+    if command in JUMPS:
+        test_data.append('00')
+
     if command in COMMANDS_USING_IMMED:
         # get val
         value = input("V:  ")
         if value == "":
             value = "0"
 
-        if not value.isdigit():
-            return "bad input", None
+        if command not in JUMPS and command not in HEX_IMMED:
+            if not value.isdigit():
+                return "bad input", None
 
-        value_hex = _dec2hex(int(value))
+            value_hex = _dec2hex(int(value))
+        
+        else:
+            if not is_hex(value):
+                return "bad input", None
+
+            value_hex = _check_for_single_digit_hex(value)
 
         test_data.append(value_hex)
-        history_line.append(value)
+        history_line.append(value) 
+
 
     os.system("clear")
 
