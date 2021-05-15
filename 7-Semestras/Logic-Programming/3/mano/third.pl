@@ -2,7 +2,6 @@
  * Marius Pozniakovas
  * 4 kursas, 1 grupė
  * uzduotys: 1.13; 2.1; 3.2; 4.5
- * https://swish.swi-prolog.org/p/3-prolog.pl
 */
 
 /* 1.13
@@ -13,13 +12,12 @@
     R = [1,2,4,5,7,11].
 */
 
-sulieti([],[],[]).
-sulieti([X],[],[X]):-!.
-sulieti([],[Y],[Y]).
-sulieti([X|List1],[Y|List2],[X|List]) :- X < Y, !, 
-    sulieti(List1,[Y|List2],List).
-sulieti([X|List1],[Y|List2],[Y|List]) :- 
-    sulieti([X|List1],List2,List).
+sulieti([],R,R).
+sulieti(R,[],R).
+sulieti([H1|T1], [H2|T2], R) :- 
+    H1 < H2 -> R = [H1|Other], sulieti(T1,[H2|T2],Other), !;
+    H1 > H2 -> R = [H2|Other], sulieti([H1|T1],T2,Other), !;
+    R = [H1,H2|Other], sulieti(T1,T2,Other), !.
 
 /* 2.1
 	nr(S,K,E) - E yra K-asis sąrašo S elementas. Pavyzdžiui:
@@ -30,9 +28,7 @@ sulieti([X|List1],[Y|List2],[Y|List]) :-
 nr([H|_],1,H) :-
     !.
 nr([_|T],N,H) :-
-    N > 0, %loop prevention
-    N1 is N-1,
-    nr(T,N1,H).
+    N > 0, N1 is N-1, nr(T,N1,H).
 	
 /* 3.2
 	bendri(S1,S2,R) - sąrašas R susideda iš bendrų duotųjų sąrašų S1 ir S2 elementų. 
@@ -41,11 +37,14 @@ nr([_|T],N,H) :-
 	R = [b,d].
 */
 
+is_member(X,[X|_]).
+is_member(X,[_|T]) :- is_member(X,T).
+
 
 bendri([], _, []).
+bendri(_, [], []).
 bendri([H1|T1], L2, [H1|Res]) :-
-    member(H1, L2),
-    bendri(T1, L2, Res),!.
+    is_member(H1, L2), bendri(T1, L2, Res), !.
 bendri([_|T1], L2, Res) :-
     bendri(T1, L2, Res).
 
@@ -56,13 +55,16 @@ bendri([_|T1], L2, Res) :-
     Sar = [1,4,5,6]. 
 */
 
-splitRev(0,[]).
-splitRev(N,[A|As]) :- !, N1 is floor(N/10), A is N mod 10, splitRev(N1,As).
-
 des_skaitm(Skaic, Sar) :-
-    splitRev(Skaic, ReversedSar),
-    reverse(Sar, ReversedSar), !.
-    
+    skaic(Skaic, ReversedSar),
+    reverse_cus(Sar, [], ReversedSar), !.
+
+reverse_cus(A, [], A). 
+reverse_cus([H|T],A,R):- reverse_cus(T,[H|A],R).
+
+skaic(0,[]).
+skaic(N,[A|As]) :- !, N1 is floor(N/10), A is N mod 10, skaic(N1,As).
+
 
 
 

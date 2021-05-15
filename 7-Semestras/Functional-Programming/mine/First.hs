@@ -10,10 +10,12 @@ nAnd2 :: Bool -> Bool -> Bool
 nAnd2 x y = not(x&&y)
 
 nAnd3 :: Bool -> Bool -> Bool
+
 nAnd3 True True = False
-nAnd3 False False = True
-nAnd3 False True = True
-nAnd3 True False = True
+nAnd3 _ _ = True
+--nAnd3 False False = True
+--nAnd3 False True = True
+--nAnd3 True False = True
 
 --2 
 --test_ands1 :: Bool -> Bool -> Bool
@@ -30,9 +32,8 @@ testAnds2 a b = (nAnd a b == nAnd3 a b)
 --3
 nDigits :: Int -> Int
 nDigits num
-    |   num > 0 = length(show num)
+    |   num >= 0 = length(show num)
     |   num < 0 = nDigits(abs num)
-    |   num == 0 = 1
 
 --4
 nRoots :: Float -> Float -> Float -> Float
@@ -66,7 +67,7 @@ mult :: Integer -> Integer -> Integer
 mult n m
     |   n == 0 || m == 0 = 0
     |   m < 0 && n < 0 = mult (abs n) (abs m)
-    |   m < 0 = mult n m
+    |   m < 0 = mult m n
     |   otherwise = (mult (m - 1) n) + n
 
 --8
@@ -74,10 +75,11 @@ prod :: Integer -> Integer -> Integer
 prod m n
     |   m > n = error "m must be less than n"
     |   m == n = m
-    |   otherwise = m * prod(m+1) n
+    |   otherwise = n * prod(m) (n-1)
 
 --factorial
 fact :: Integer -> Integer
+fact 0 = 1
 fact x = prod 1 x
 
 

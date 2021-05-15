@@ -90,7 +90,7 @@ any_filter :: (a->Bool) -> [a] -> Bool
 any_filter f list = length (filter f list) > 0
 
 all_filter :: (a->Bool) -> [a] -> Bool
-all_filter f list = length (filter f list) == length list
+all_filter f list = filter f list == list
 
 
 ------------------------
